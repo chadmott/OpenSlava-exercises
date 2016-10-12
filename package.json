@@ -13,7 +13,8 @@
   },
   "scripts": {
     "build": "tsc",
-    "lint": "tslint -c ./tslint.json '**/*.ts' -e  'node_modules/**'"
+    "lint": "tslint -c ./tslint.json '**/*.ts' -e  'node_modules/**'",
+    "test": "mocha -watch ./**/*Spec.js"
   },
   "devDependencies": {
     "tslint": "^3.15.1",
