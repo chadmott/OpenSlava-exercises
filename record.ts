@@ -9,6 +9,8 @@
     route53: any;
     event: any;
 }
+
+
 export class Record implements IRecord {
     HostedZoneId;
     fqdn;
