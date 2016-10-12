@@ -33,4 +33,7 @@ event.json
 deploy.env
 *.map
 .vscode
+merge.sh
+*.js
+
 
