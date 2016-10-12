@@ -3,13 +3,29 @@
  import * as AWS from 'aws-sdk';
 
  interface IRecord {
-    HostedZoneId: string;
-    fqdn: string;
-    requestIP: string;
-    route53: any;
+    readonly HostedZoneId: string;
+    readonly fqdn: string;
+    readonly requestIP: string;
+    readonly route53: any;
     event: any;
 }
 
+interface IChange {
+    Action: string;
+    ResourceRecordSet: {
+        Name: string;
+        Type: string;
+        ResourceRecords: any[];
+        TTL: number;
+    }
+}
+
+interface IResourceParams {
+    HostedZoneId: string
+    ChangeBatch: {
+        Changes: IChange[]
+    }
+}
 
 export class Record implements IRecord {
     HostedZoneId;
@@ -23,8 +39,9 @@ export class Record implements IRecord {
         this.requestIP = event.sourceIP;
         this.route53 = new AWS.Route53();
     }
+
     getRecordIP() {
-        let params = {
+        const params = {
             HostedZoneId: this.HostedZoneId, /* required */
             StartRecordName: this.fqdn,
             StartRecordType: 'A',
@@ -36,7 +53,7 @@ export class Record implements IRecord {
                 this.context.succeed({ update: false, piip: this.event.sourceIP, reason: 'Route 53 failure' + err });
             }
             else {
-                let recordIP = data.ResourceRecordSets[0].ResourceRecords[0].Value;
+                const recordIP = data.ResourceRecordSets[0].ResourceRecords[0].Value;
                 if (this.requestIP != data.ResourceRecordSets[0].ResourceRecords[0].Value) {
                     this.updateRecord();
                 } else {
@@ -45,8 +62,9 @@ export class Record implements IRecord {
             }
         });
     };
-    updateRecord() {
-        let params = {
+
+    private updateRecord() {
+        const params: IResourceParams = {
             ChangeBatch: {
                 Changes: [
                     {
@@ -66,7 +84,7 @@ export class Record implements IRecord {
             },
             HostedZoneId: this.HostedZoneId
         };
-        this.route53.changeResourceRecordSets(params, (err: any, data: any) => {
+        this.route53.changeResourceRecordSets(params, (err: string) => {
             if (err) {
                 this.context.succeed({ update: false, piip: this.event.sourceIP, reason: 'Route 53 failure' + err });
             }

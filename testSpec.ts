@@ -1,32 +1,36 @@
 'use strict';
 
 import * as chai from 'chai';
-import {handler} from './index';
-let cats = 'dogs';
-let expect = chai.expect;
-describe('myLambda', function () {
-    let authCode = 123;
-    it('should fail with invalid authcode' + authCode, function (done) {
-        let context = {
-            succeed: function (result) {
+import { handler } from './index';
+
+const cats = 'dogs';
+const expect = chai.expect;
+
+describe('myLambda', () => {
+    const authCode = 123;
+    it('should fail with invalid authcode' + authCode, (done) => {
+        console.log(handler);
+        const context = {
+            succeed: (result) => {
                 expect(result.update).to.be.false;
                 expect(result.reason).to.equal('not authenticated');
                 done();
             },
-            fail: function () {
+            fail: () => {
                 done(new Error('never context.fail'));
             }
         };
         handler({ authcode: authCode }, context);
     });
-    it('should fail when it cannot connect to route 53', function (done) {
-        let context = {
-            succeed: function (result) {
+
+    it('should fail when it cannot connect to route 53', (done) => {
+        const context = {
+            succeed: (result) => {
                 expect(result.update).to.be.false;
                 expect(result.reason).to.include('Route 53 failure');
                 done();
             },
-            fail: function () {
+            fail: () => {
                 done(new Error('never context.fail'));
             }
         };
