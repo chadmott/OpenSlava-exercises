@@ -21,6 +21,7 @@ node_modules/
 npm-debug.log
 testem.log
 /typings
+*.js
 
 
 

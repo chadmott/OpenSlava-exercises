@@ -3,14 +3,20 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@types/aws-sdk": "0.0.38",
     "@types/node": "^6.0.45",
-    "aws-sdk": "^2.6.7"
+    "aws-sdk": "^2.6.7",
+    "chai": "^3.5.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "tslint -c ./tslint.json '**/*.ts' -e  'node_modules/**'"
+  },
+  "devDependencies": {
+    "tslint": "^3.15.1",
+    "typescript": "^2.0.3"
   }
 }

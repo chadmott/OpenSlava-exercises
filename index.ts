@@ -1,5 +1,6 @@
 'use strict';
 
+let cats = 'dogs';
 import * as AWS from 'aws-sdk';
 
 export function handler(event: any, context: any) {

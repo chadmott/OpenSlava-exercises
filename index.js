@@ -1,42 +1,36 @@
 'use strict';
-
-import * as AWS from 'aws-sdk';
-
-export function handler(event: any, context: any) {
-
-    // config variables
-    const HostedZoneId: string = 'xyz'; // hosted zone ID from Route53
-    const fqdn: string = 'xyz'; // domain name for API
-    const authcode: string = 'xyz'; // rudamentary authentication -- you pass t`his as a git param 
-    const requestIP: string = event.sourceIP;
-
-    let route53 = new AWS.Route53();
-
-    // get the IP address that is currently listed 
+var cats = 'dogs';
+var AWS = require('aws-sdk');
+function handler(event, context) {
+    var HostedZoneId = 'xyz';
+    var fqdn = 'xyz';
+    var authcode = 'xyz';
+    var requestIP = event.sourceIP;
+    var route53 = new AWS.Route53();
     function getRecordIP() {
-        let params = {
-            HostedZoneId: HostedZoneId, /* required */
+        var params = {
+            HostedZoneId: HostedZoneId,
             StartRecordName: fqdn,
             StartRecordType: 'A',
             MaxItems: '1'
         };
-        route53.listResourceRecordSets(params, function (err: any, data: any) {
+        route53.listResourceRecordSets(params, function (err, data) {
             if (err) {
                 context.succeed({ update: false, piip: event.sourceIP, reason: 'Route 53 failure' + err });
             }
             else {
-                let recordIP = data.ResourceRecordSets[0].ResourceRecords[0].Value;
+                var recordIP = data.ResourceRecordSets[0].ResourceRecords[0].Value;
                 if (requestIP !== data.ResourceRecordSets[0].ResourceRecords[0].Value) {
                     updateRecord();
-                } else {
+                }
+                else {
                     context.succeed({ update: false, piip: event.sourceIP, reason: 'Request and record are the same' });
                 }
             }
         });
     }
-    // update the DNS record
     function updateRecord() {
-        let params = {
+        var params = {
             ChangeBatch: {
                 Changes: [
                     {
@@ -49,14 +43,14 @@ export function handler(event: any, context: any) {
                                     Value: event.sourceIP
                                 },
                             ],
-                            TTL: 0,
+                            TTL: 0
                         }
                     },
-                ],
+                ]
             },
             HostedZoneId: HostedZoneId
         };
-        route53.changeResourceRecordSets(params, function (err: any, data: any) {
+        route53.changeResourceRecordSets(params, function (err, data) {
             if (err) {
                 context.succeed({ update: false, piip: event.sourceIP, reason: 'Route 53 failure' + err });
             }
@@ -71,5 +65,6 @@ export function handler(event: any, context: any) {
     else {
         context.succeed({ update: false, piip: event.sourceIP, reason: 'not authenticated' });
     }
-};
-
+}
+exports.handler = handler;
+;
