@@ -6,7 +6,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/aws-sdk": "0.0.38",
     "@types/chai": "^3.4.34",
     "@types/mocha": "^2.2.32",
     "@types/node": "^6.0.45",
