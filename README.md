@@ -1,18 +1,36 @@
-IP Sync Application. 
+# Open Slava Exercises
 
-The goal of this application is to replace Dynamic DNS using AWS lambda. 
+IP Sync Application.
 
-##Step 1
-Excercise Getting Started 
+The goal of this application is to replace Dynamic DNS using AWS lambda.
 
-navigate to a new directory and clone the repo. 
-`git clone TODO` 
+## Before starting
 
-`git checkout step-0`
+Make sure you have:
 
-this is basically an empty branch. 
+**Required:**
 
-We need to scaffold a vanilla node project. 
+- Mac, CYGWIN/GitBash on Windows
+- [NodeJS 6.7.0](https://nodejs.org/en/)
+- Typescript 2.0 (`npm install -g typescript`)
+
+**Optional:**
+
+- An AWS “Free Tier” account
+- [Visual Studio Code](https://code.visualstudio.com/)
+
+## Step 1
+
+Excercise Getting Started,
+
+navigate to a new directory and clone the repo.
+`git clone https://github.com/chadmott/OpenSlava-exercises`
+
+`git checkout step-1`
+
+this is basically an empty branch.
+
+We need to scaffold a vanilla node project.
 
 `npm init`
 
@@ -23,7 +41,6 @@ we will also need the AWS-SDK
 `npm install aws-sdk --save`
 `npm install typescript --save`
 
-
 create our lambda function
 
 ```typescript
@@ -32,13 +49,13 @@ exports.handler = (event, context) => {
     //config variables
     var HostedZoneId = 'xyz'; //hosted zone ID from Route53
     var fqdn = 'xyz'; //domain name for API
-    var authcode = 'xyz'; //rudamentary authentication -- you pass this as a git param 
-    
+    var authcode = 'xyz'; //rudamentary authentication -- you pass this as a git param
+
     var requestIP = event.sourceIP;
     var AWS = require("aws-sdk");
     var route53 = new AWS.Route53();
 
-    //get the IP address that is currently listed 
+    //get the IP address that is currently listed
     function getRecordIP() {
         var params = {
             HostedZoneId: HostedZoneId, /* required */
@@ -62,7 +79,7 @@ exports.handler = (event, context) => {
     }
          //update the DNS record
     function updateRecord() {
-   
+
         var params = {
             ChangeBatch: {
                 Changes: [
@@ -101,27 +118,28 @@ exports.handler = (event, context) => {
 };
 ```
 
-Test this by running 
+Test this by running
 `node-lambda run`
 
-If things are working well, then you should see 
+If things are working well, then you should see
 `Success:{"update":false,"piip":"8.8.8.8","reason":"not authenticated"}`
 
-This would actually work if we had our local AWS credentials setup, but we arent going to do that just yet. The important part is that we are able to run the lambda. 
+This would actually work if we had our local AWS credentials setup, but we arent going to do that just yet. The important part is that we are able to run the lambda.
 
 This will work, but it has the following problems:
 - not in typescript (duh)
 - not testing
-- no linting 
+- no linting
 
-We will work on these in the next steps. 
+We will work on these in the next steps.
 If you got stuck, please `git checkout step-1`
 
 ##Step 2
+
 _if you need to start here, please run_ `git checkout step-1`
 Lets start to convert this to typescript!
 
-first, make sure that you have typescript installed. 
+first, make sure that you have typescript installed.
 `npm install -g typescript`
 
 next, we need to make sure that our editor is using the most recent version of typescript by setting that in our user settings in VS code
@@ -134,8 +152,8 @@ Now we can convert to TypeScript!
 - `npm install @types/aws-sdk`
 - `tsc index.ts` then node-lambda run and observe the same result as before
 
-So now we see that this "TypeScript" basically works the same way. Lets keep going. 
-- convert "var" to "let" in all instances. 
+So now we see that this "TypeScript" basically works the same way. Lets keep going.
+- convert "var" to "let" in all instances.
 - use arrow functions for fun!
 - remove the "require" and do an import
 
@@ -159,11 +177,11 @@ _if you need to start here, please run_ `git checkout step-2`
 Now lets make our development experience better.
 
 What do we want to do:
-- auto compile the TypeScript, and set some other typescript options 
+- auto compile the TypeScript, and set some other typescript options
 - Hide the generated JS files
 - have a good NPM build setup
 - setup linting
-- add unit tests 
+- add unit tests
 
 tsconfig.json
 
@@ -182,10 +200,10 @@ tsconfig.json
             "./node_modules/@types"
         ],
         "watch": true
-     
+
     },
     "compileOnSave": true,
-    
+
     "include": [
         "**/*"
     ],
@@ -230,10 +248,10 @@ now if we run "nam run build" then it will execute "tsc". However, I want it to 
         "typeRoots": [
             "./node_modules/@types"
         ],
-        "watch": true  
+        "watch": true
     },
     "compileOnSave": true,
-    
+
     "include": [
         "**/*"
     ],
@@ -243,7 +261,7 @@ now if we run "nam run build" then it will execute "tsc". However, I want it to 
 }
 ```
 
-now when I run npm run-build, it will watch the file. 
+now when I run npm run-build, it will watch the file.
 
 Now we should add lint.
 
@@ -370,7 +388,7 @@ describe('myLambda', function () {
 });
 ```
 
-Now, if your build task is running, this will be auto-compiled. 
+Now, if your build task is running, this will be auto-compiled.
 
 we can add this to our NPM build tool as well
 
@@ -391,7 +409,7 @@ import * as AWS from 'aws-sdk';
 import {Record} from './record';
 
 export function handler(event: any, context: any) {
-    const authcode: string = 'xyz'; // rudamentary authentication -- you pass t`his as a get param 
+    const authcode: string = 'xyz'; // rudamentary authentication -- you pass t`his as a get param
 
     if (event.authcode === authcode) {
         let record = new Record(event, context);
