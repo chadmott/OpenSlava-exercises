@@ -3,7 +3,6 @@
 import * as chai from 'chai';
 import { handler } from './index';
 
-const cats = 'dogs';
 const expect = chai.expect;
 
 describe('myLambda', () => {
