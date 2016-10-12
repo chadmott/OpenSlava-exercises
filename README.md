@@ -4,6 +4,15 @@ IP Sync Application.
 
 The goal of this application is to replace Dynamic DNS using AWS lambda.
 
+This is excerise 1. 
+
+Exercise 2 Repo is located here:
+https://github.com/chadmott/homeAutomationAPI
+
+Exercise 3 Repo is located here:
+https://github.com/chadmott/homeAutomationUI
+
+
 ## Before starting
 
 Make sure you have:
