@@ -160,11 +160,12 @@ So now we see that this "TypeScript" basically works the same way. Lets keep goi
 Here we have a problem. We have a red squiggle under .Route53
 - this is symptom of the fast moving pace of TypeScript. We must edit the type definition file
 - this is a bit of a hack, this will be fixed with time .
-- edit the node_modules/@types/index.d.ts with the following
+- create a typings folder, then under it a file called aws-sdk.d.ts
+
 
 ```typescript
   //./exercise-1/node_modules/@types/aws-sdk
-  export declare class Route53 {
+  export class Route53 {
     constructor(options?: any);
     endpoint: Endpoint;
     listResourceRecordSets(params: any, callback: (err: Error, data: any) => void): void;
