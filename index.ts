@@ -1,53 +1,59 @@
 'use strict';
 
-let cats = 'dogs';
 import * as AWS from 'aws-sdk';
+ interface IRecord {
+    HostedZoneId: string;
+    fqdn: string;
+    requestIP: string;
+    route53: any;
+    event: any;
+}
+class Record implements IRecord {
+    HostedZoneId;
+    fqdn;
+    requestIP;
+    route53;
 
-export function handler(event: any, context: any) {
-
-    // config variables
-    const HostedZoneId: string = 'xyz'; // hosted zone ID from Route53
-    const fqdn: string = 'xyz'; // domain name for API
-    const authcode: string = 'xyz'; // rudamentary authentication -- you pass t`his as a git param 
-    const requestIP: string = event.sourceIP;
-
-    let route53 = new AWS.Route53();
-
-    // get the IP address that is currently listed 
-    function getRecordIP() {
-        let params = {
-            HostedZoneId: HostedZoneId, /* required */
-            StartRecordName: fqdn,
+    constructor(public event: any, public context: any) {
+        this.HostedZoneId = 'xyz'; //hosted zone ID from Route53
+        this.fqdn = 'xyz'; //domain name for API
+        this.requestIP = event.sourceIP;
+        this.route53 = new AWS.Route53();
+    }
+    getRecordIP() {
+        var params = {
+            HostedZoneId: this.HostedZoneId, /* required */
+            StartRecordName: this.fqdn,
             StartRecordType: 'A',
             MaxItems: '1'
         };
-        route53.listResourceRecordSets(params, function (err: any, data: any) {
+
+        this.route53.listResourceRecordSets(params, (err: any, data: any) => {
             if (err) {
-                context.succeed({ update: false, piip: event.sourceIP, reason: 'Route 53 failure' + err });
+                this.context.succeed({ update: false, piip: this.event.sourceIP, reason: 'Route 53 failure' + err });
             }
             else {
-                let recordIP = data.ResourceRecordSets[0].ResourceRecords[0].Value;
-                if (requestIP !== data.ResourceRecordSets[0].ResourceRecords[0].Value) {
-                    updateRecord();
+                var recordIP = data.ResourceRecordSets[0].ResourceRecords[0].Value;
+                if (this.requestIP != data.ResourceRecordSets[0].ResourceRecords[0].Value) {
+                    this.updateRecord();
                 } else {
-                    context.succeed({ update: false, piip: event.sourceIP, reason: 'Request and record are the same' });
+                    this.context.succeed({ update: false, piip: this.event.sourceIP, reason: 'Request and record are the same' });
                 }
             }
         });
-    }
-    // update the DNS record
-    function updateRecord() {
-        let params = {
+    };
+    updateRecord() {
+        var params = {
             ChangeBatch: {
                 Changes: [
                     {
                         Action: 'UPSERT',
                         ResourceRecordSet: {
-                            Name: fqdn,
+                            Name: this.fqdn,
                             Type: 'A',
                             ResourceRecords: [
                                 {
-                                    Value: event.sourceIP
+                                    Value: this.event.sourceIP
                                 },
                             ],
                             TTL: 0,
@@ -55,19 +61,26 @@ export function handler(event: any, context: any) {
                     },
                 ],
             },
-            HostedZoneId: HostedZoneId
+            HostedZoneId: this.HostedZoneId
         };
-        route53.changeResourceRecordSets(params, function (err: any, data: any) {
+        this.route53.changeResourceRecordSets(params, (err: any, data: any) => {
             if (err) {
-                context.succeed({ update: false, piip: event.sourceIP, reason: 'Route 53 failure' + err });
+                this.context.succeed({ update: false, piip: this.event.sourceIP, reason: 'Route 53 failure' + err });
             }
             else {
-                context.succeed({ update: true, piip: event.sourceIP, reason: 'authenticated and needed update' });
+                this.context.succeed({ update: true, piip: this.event.sourceIP, reason: 'authenticated and needed update' });
             }
         });
     }
+}
+
+export function handler(event: any, context: any) {
+    //config variables
+    const authcode: string = 'xyz'; //rudamentary authentication -- you pass t`his as a get param 
+
     if (event.authcode === authcode) {
-        getRecordIP();
+        let record = new Record(event, context);
+        record.getRecordIP();
     }
     else {
         context.succeed({ update: false, piip: event.sourceIP, reason: 'not authenticated' });
